@@ -8,7 +8,6 @@ import {
 	Group,
 	Card,
 	ActionIcon,
-	Code,
 } from '@mantine/core';
 import { useState, useRef, useEffect } from 'react';
 import { MoonStars, Sun, Trash } from 'tabler-icons-react';
@@ -16,16 +15,14 @@ import { MoonStars, Sun, Trash } from 'tabler-icons-react';
 import {
 	MantineProvider,
 	ColorSchemeProvider,
-	ColorScheme,
 } from '@mantine/core';
-import { useColorScheme } from '@mantine/hooks';
 import { useHotkeys, useLocalStorage } from '@mantine/hooks';
 
 export default function App() {
 	const [tasks, setTasks] = useState([]);
 	const [opened, setOpened] = useState(false);
+	const [filter, setFilter] = useState('all');
 
-	const preferredColorScheme = useColorScheme();
 	const [colorScheme, setColorScheme] = useLocalStorage({
 		key: 'mantine-color-scheme',
 		defaultValue: 'light',
@@ -51,6 +48,7 @@ export default function App() {
 			startTime: taskStartTime.current.value,
 			endDate: taskEndDate.current.value,
 			endTime: taskEndTime.current.value,
+			done: false,
 		};
 
 		setTasks([...tasks, newTask]);
@@ -74,6 +72,7 @@ export default function App() {
 		let tasks = JSON.parse(loadedTasks);
 
 		if (tasks) {
+			tasks = tasks.map(task => ({ ...task, done: task.done || false }));
 			setTasks(tasks);
 		}
 	}
@@ -174,6 +173,26 @@ export default function App() {
 								})}>
 								My Tasks
 							</Title>
+							<Group position={'apart'}>
+								<Button
+									onClick={() => setFilter('all')}
+									variant={filter === 'all' ? 'filled' : 'outline'}
+								>
+									All
+								</Button>
+								<Button
+									onClick={() => setFilter('inProgress')}
+									variant={filter === 'inProgress' ? 'filled' : 'outline'}
+								>
+									In Progress
+								</Button>
+								<Button
+									onClick={() => setFilter('done')}
+									variant={filter === 'done' ? 'filled' : 'outline'}
+								>
+									Done
+								</Button>
+							</Group>
 							<ActionIcon
 								color={'blue'}
 								onClick={() => toggleColorScheme()}
@@ -187,7 +206,11 @@ export default function App() {
 						</Group>
 						{tasks.length > 0 ? (
 							tasks.map((task, index) => {
-								if (task.title) {
+								if (
+									(filter === 'all') ||
+									(filter === 'inProgress' && !task.done) ||
+									(filter === 'done' && task.done)
+								) {
 									return (
 										<Card withBorder key={index} mt={'sm'}>
 											<Group position={'apart'}>
@@ -201,6 +224,16 @@ export default function App() {
 													<Trash />
 												</ActionIcon>
 											</Group>
+											<input
+												type="checkbox"
+												checked={task.done}
+												onChange={() => {
+													const updatedTasks = [...tasks];
+													updatedTasks[index].done = !updatedTasks[index].done;
+													setTasks(updatedTasks);
+													saveTasks(updatedTasks);
+												}}
+											/>
 											<Text color={'dimmed'} size={'md'} mt={'sm'}>
 												{task.summary
 													? task.summary
@@ -208,12 +241,22 @@ export default function App() {
 											</Text>
 											<Text color={'dimmed'} size={'md'} mt={'sm'}>
 												{task.startDate
-													? `Start Date: ${task.startDate}, Start Time: ${task.startTime}`
+													? `Start Date: ${task.startDate}`
 													: 'No date specified'}
 											</Text>
 											<Text color={'dimmed'} size={'md'} mt={'sm'}>
+												{task.startTime
+													? `Start Time: ${task.startTime}`
+													: 'No time specified'}
+											</Text>
+											<Text color={'dimmed'} size={'md'} mt={'sm'}>
 												{task.endDate
-													? `End Date: ${task.endDate}, End Time: ${task.endTime}`
+													? `End Date: ${task.endDate}`
+													: 'No date specified'}
+											</Text>
+											<Text color={'dimmed'} size={'md'} mt={'sm'}>
+												{task.endTime
+													? `End Time: ${task.endTime}`
 													: 'No date specified'}
 											</Text>
 										</Card>
