@@ -38,23 +38,24 @@ export default function App() {
 
 	const taskTitle = useRef('');
 	const taskSummary = useRef('');
+	const taskStartDate = useRef('');
+	const taskStartTime = useRef('');
+	const taskEndDate = useRef('');
+	const taskEndTime = useRef('');
 
 	function createTask() {
-		setTasks([
-			...tasks,
-			{
-				title: taskTitle.current.value,
-				summary: taskSummary.current.value,
-			},
-		]);
+		const newTask = {
+			title: taskTitle.current.value,
+			summary: taskSummary.current.value,
+			startDate: taskStartDate.current.value,
+			startTime: taskStartTime.current.value,
+			endDate: taskEndDate.current.value,
+			endTime: taskEndTime.current.value,
+		};
 
-		saveTasks([
-			...tasks,
-			{
-				title: taskTitle.current.value,
-				summary: taskSummary.current.value,
-			},
-		]);
+		setTasks([...tasks, newTask]);
+
+		saveTasks([...tasks, newTask]);
 	}
 
 	function deleteTask(index) {
@@ -102,7 +103,8 @@ export default function App() {
 						onClose={() => {
 							setOpened(false);
 						}}
-						centered>
+						centered
+					>
 						<TextInput
 							mt={'md'}
 							ref={taskTitle}
@@ -116,19 +118,49 @@ export default function App() {
 							placeholder={'Task Summary'}
 							label={'Summary'}
 						/>
+						<TextInput
+							ref={taskStartDate}
+							mt={'md'}
+							type="date"
+							placeholder={'Start Date'}
+							label={'Start Date'}
+						/>
+						<TextInput
+							ref={taskStartTime}
+							mt={'md'}
+							type="time"
+							placeholder={'Start Time'}
+							label={'Start Time'}
+						/>
+						<TextInput
+							ref={taskEndDate}
+							mt={'md'}
+							type="date"
+							placeholder={'End Date'}
+							label={'End Date'}
+						/>
+						<TextInput
+							ref={taskEndTime}
+							mt={'md'}
+							type="time"
+							placeholder={'End Time'}
+							label={'End Time'}
+						/>
 						<Group mt={'md'} position={'apart'}>
 							<Button
 								onClick={() => {
 									setOpened(false);
 								}}
-								variant={'subtle'}>
+								variant={'subtle'}
+							>
 								Cancel
 							</Button>
 							<Button
 								onClick={() => {
 									createTask();
 									setOpened(false);
-								}}>
+								}}
+							>
 								Create Task
 							</Button>
 						</Group>
@@ -173,6 +205,16 @@ export default function App() {
 												{task.summary
 													? task.summary
 													: 'No summary was provided for this task'}
+											</Text>
+											<Text color={'dimmed'} size={'md'} mt={'sm'}>
+												{task.startDate
+													? `Start Date: ${task.startDate}, Start Time: ${task.startTime}`
+													: 'No date specified'}
+											</Text>
+											<Text color={'dimmed'} size={'md'} mt={'sm'}>
+												{task.endDate
+													? `End Date: ${task.endDate}, End Time: ${task.endTime}`
+													: 'No date specified'}
 											</Text>
 										</Card>
 									);
