@@ -1,60 +1,199 @@
-import React, { useState } from 'react';
-import './App.css';
+import {
+	Button,
+	Container,
+	Text,
+	Title,
+	Modal,
+	TextInput,
+	Group,
+	Card,
+	ActionIcon,
+	Code,
+} from '@mantine/core';
+import { useState, useRef, useEffect } from 'react';
+import { MoonStars, Sun, Trash } from 'tabler-icons-react';
 
-function App() {
-  const [tasks, setTasks] = useState([]);
-  const [tasksCompleted, setTasksCompleted] = useState([]);
-  const [task, setTask] = useState('');
+import {
+	MantineProvider,
+	ColorSchemeProvider,
+	ColorScheme,
+} from '@mantine/core';
+import { useColorScheme } from '@mantine/hooks';
+import { useHotkeys, useLocalStorage } from '@mantine/hooks';
 
-  const addTask = () => {
-    if (task) { // Vérifie si la chaîne de caractères 'task' n'est pas vide
-      setTasks([...tasks, task]); // Ajoute la nouvelle tâche à la liste des tâches
-      setTask(''); // Réinitialise l'entrée après l'ajout
-    }
-  };
+export default function App() {
+	const [tasks, setTasks] = useState([]);
+	const [opened, setOpened] = useState(false);
 
-  const deleteTask = (indexToDelete) => {
-    setTasks(tasks.filter((_, index) => index !== indexToDelete)); // Supprime la tâche de la liste
-    setTasksCompleted([...tasksCompleted, tasks[indexToDelete]]);
-  };
+	const preferredColorScheme = useColorScheme();
+	const [colorScheme, setColorScheme] = useLocalStorage({
+		key: 'mantine-color-scheme',
+		defaultValue: 'light',
+		getInitialValueInEffect: true,
+	});
+	const toggleColorScheme = value =>
+		setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'));
 
-  const markTaskCompleted = (indexToMark) => {
-    setTasksCompleted([...tasksCompleted, tasks[indexToMark]]);
-    setTasks(tasks.filter((_, index) => index !== indexToMark));
-  };
-//coucou
-  return (
-      <div className="App">
-        <header className="App-header">
-          <h1>SimpleTasker</h1>
-          <div>
-            <input
-                type="text"
-                value={task}
-                onChange={(e) => setTask(e.target.value)}
-                placeholder="Ajouter une nouvelle tâche..."
-            />
-            <button onClick={addTask}>Ajouter</button>
-          </div>
-          <ul>
-            {tasks.map((t, index) => (
-                <li key={index}>
-                  {t}
-                  <button onClick={() => deleteTask(index)}>Supprimer</button>
-                </li>
-            ))}
-          </ul>
-          <ul>
-            {tasksCompleted.map((t, index) => (
-                <li key={index}>
-                  {t}
-                  <button onClick={() => markTaskCompleted(index)}>Tâche terminée</button>
-                </li>
-            ))}
-          </ul>
-        </header>
-      </div>
-  );
+	useHotkeys([['mod+J', () => toggleColorScheme()]]);
+
+	const taskTitle = useRef('');
+	const taskSummary = useRef('');
+
+	function createTask() {
+		setTasks([
+			...tasks,
+			{
+				title: taskTitle.current.value,
+				summary: taskSummary.current.value,
+			},
+		]);
+
+		saveTasks([
+			...tasks,
+			{
+				title: taskTitle.current.value,
+				summary: taskSummary.current.value,
+			},
+		]);
+	}
+
+	function deleteTask(index) {
+		var clonedTasks = [...tasks];
+
+		clonedTasks.splice(index, 1);
+
+		setTasks(clonedTasks);
+
+		saveTasks([...clonedTasks]);
+	}
+
+	function loadTasks() {
+		let loadedTasks = localStorage.getItem('tasks');
+
+		let tasks = JSON.parse(loadedTasks);
+
+		if (tasks) {
+			setTasks(tasks);
+		}
+	}
+
+	function saveTasks(tasks) {
+		localStorage.setItem('tasks', JSON.stringify(tasks));
+	}
+
+	useEffect(() => {
+		loadTasks();
+	}, []);
+
+	return (
+		<ColorSchemeProvider
+			colorScheme={colorScheme}
+			toggleColorScheme={toggleColorScheme}>
+			<MantineProvider
+				theme={{ colorScheme, defaultRadius: 'md' }}
+				withGlobalStyles
+				withNormalizeCSS>
+				<div className='App'>
+					<Modal
+						opened={opened}
+						size={'md'}
+						title={'New Task'}
+						withCloseButton={false}
+						onClose={() => {
+							setOpened(false);
+						}}
+						centered>
+						<TextInput
+							mt={'md'}
+							ref={taskTitle}
+							placeholder={'Task Title'}
+							required
+							label={'Title'}
+						/>
+						<TextInput
+							ref={taskSummary}
+							mt={'md'}
+							placeholder={'Task Summary'}
+							label={'Summary'}
+						/>
+						<Group mt={'md'} position={'apart'}>
+							<Button
+								onClick={() => {
+									setOpened(false);
+								}}
+								variant={'subtle'}>
+								Cancel
+							</Button>
+							<Button
+								onClick={() => {
+									createTask();
+									setOpened(false);
+								}}>
+								Create Task
+							</Button>
+						</Group>
+					</Modal>
+					<Container size={550} my={40}>
+						<Group position={'apart'}>
+							<Title
+								sx={theme => ({
+									fontFamily: `Greycliff CF, ${theme.fontFamily}`,
+									fontWeight: 900,
+								})}>
+								My Tasks
+							</Title>
+							<ActionIcon
+								color={'blue'}
+								onClick={() => toggleColorScheme()}
+								size='lg'>
+								{colorScheme === 'dark' ? (
+									<Sun size={16} />
+								) : (
+									<MoonStars size={16} />
+								)}
+							</ActionIcon>
+						</Group>
+						{tasks.length > 0 ? (
+							tasks.map((task, index) => {
+								if (task.title) {
+									return (
+										<Card withBorder key={index} mt={'sm'}>
+											<Group position={'apart'}>
+												<Text weight={'bold'}>{task.title}</Text>
+												<ActionIcon
+													onClick={() => {
+														deleteTask(index);
+													}}
+													color={'red'}
+													variant={'transparent'}>
+													<Trash />
+												</ActionIcon>
+											</Group>
+											<Text color={'dimmed'} size={'md'} mt={'sm'}>
+												{task.summary
+													? task.summary
+													: 'No summary was provided for this task'}
+											</Text>
+										</Card>
+									);
+								}
+							})
+						) : (
+							<Text size={'lg'} mt={'md'} color={'dimmed'}>
+								You have no tasks
+							</Text>
+						)}
+						<Button
+							onClick={() => {
+								setOpened(true);
+							}}
+							fullWidth
+							mt={'md'}>
+							New Task
+						</Button>
+					</Container>
+				</div>
+			</MantineProvider>
+		</ColorSchemeProvider>
+	);
 }
-
-export default App;
