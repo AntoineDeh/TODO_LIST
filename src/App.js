@@ -7,7 +7,7 @@ import {
 	TextInput,
 	Group,
 	Card,
-	ActionIcon, Grid,
+	ActionIcon,
 	Select,
 } from '@mantine/core';
 import { useState, useRef, useEffect } from 'react';
@@ -214,64 +214,73 @@ export default function App() {
 							</Button>
 						</Group>
 					</Modal>
-					<Container size={550} my={40}>
-						<Group position={'apart'}>
-							<Title
-								sx={theme => ({
-									fontFamily: `Greycliff CF, ${theme.fontFamily}`,
-									fontWeight: 900,
-								})}>
-								My Tasks
-							</Title>
-							<Group position={'apart'}>
-								<Title
-									sx={theme => ({
-										fontFamily: `Greycliff CF, ${theme.fontFamily}`,
-										fontWeight: 900,
-									})}
-								>
-									My Tasks
-								</Title>
-								<Grid>
-									<Button
-										onClick={() => setFilter('all')}
-										variant={filter === 'all' ? 'filled' : 'outline'}
-									>
-										All
-									</Button>
-									<Button
-										onClick={() => setFilter('inProgress')}
-										variant={filter === 'inProgress' ? 'filled' : 'outline'}
-									>
-										In Progress
-									</Button>
-									<Button
-										onClick={() => setFilter('done')}
-										variant={filter === 'done' ? 'filled' : 'outline'}
-									>
-										Done
-									</Button>
-									<Button
-										onClick={() => setFilter('lowPriority')}
-										variant={filter === 'lowPriority' ? 'filled' : 'outline'}
-									>
-										Low Priority
-									</Button>
-									<Button
-										onClick={() => setFilter('mediumPriority')}
-										variant={filter === 'mediumPriority' ? 'filled' : 'outline'}
-									>
-										Medium Priority
-									</Button>
-									<Button
-										onClick={() => setFilter('highPriority')}
-										variant={filter === 'highPriority' ? 'filled' : 'outline'}
-									>
-										High Priority
-									</Button>
-								</Grid>
-							</Group>
+
+					<div className='title-container'>
+						{/* Titre "My Tasks" à gauche */}
+						<Title
+							sx={{
+								fontFamily: 'Greycliff CF',
+								fontWeight: 900,
+							}}
+						>
+							My Tasks
+						</Title>
+					</div>
+
+					{/* Conteneur pour les filtres à droite */}
+					<div className='filter-container' style={{ flexDirection: 'column' }}>
+						<Group>
+							{/* Filtre 1 */}
+							<Button
+								onClick={() => setFilter('all')}
+								variant={filter === 'all' ? 'filled' : 'outline'}
+							>
+								All
+							</Button>
+							<Button
+								onClick={() => setFilter('inProgress')}
+								variant={filter === 'inProgress' ? 'filled' : 'outline'}
+							>
+								In Progress
+							</Button>
+							<Button
+								onClick={() => setFilter('done')}
+								variant={filter === 'done' ? 'filled' : 'outline'}
+							>
+								Done
+							</Button>
 						</Group>
+
+						<Group>
+							{/* Filtre 2 */}
+							<Button
+								onClick={() => setFilter('allPriority')}
+								variant={filter === 'allPriority' ? 'filled' : 'outline'}
+							>
+								All Priority
+							</Button>
+							<Button
+								onClick={() => setFilter('lowPriority')}
+								variant={filter === 'lowPriority' ? 'filled' : 'outline'}
+							>
+								Low Priority
+							</Button>
+							<Button
+								onClick={() => setFilter('mediumPriority')}
+								variant={filter === 'mediumPriority' ? 'filled' : 'outline'}
+							>
+								Medium Priority
+							</Button>
+							<Button
+								onClick={() => setFilter('highPriority')}
+								variant={filter === 'highPriority' ? 'filled' : 'outline'}
+							>
+								High Priority
+							</Button>
+						</Group>
+					</div>
+
+					<Container size={550} my={20}>
 						{tasks.length > 0 ? (
 							tasks.map((task, index) => {
 								if (
