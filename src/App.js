@@ -7,7 +7,8 @@ import {
 	TextInput,
 	Group,
 	Card,
-	ActionIcon,
+	ActionIcon, Grid,
+	Select,
 } from '@mantine/core';
 import { useState, useRef, useEffect } from 'react';
 import { MoonStars, Sun, Trash } from 'tabler-icons-react';
@@ -15,7 +16,6 @@ import { MoonStars, Sun, Trash } from 'tabler-icons-react';
 import {
 	MantineProvider,
 	ColorSchemeProvider,
-	Select,
 } from '@mantine/core';
 import { useHotkeys, useLocalStorage } from '@mantine/hooks';
 
@@ -121,6 +121,18 @@ export default function App() {
 					>
 						New Task
 					</Button>
+					<ActionIcon
+						color={'blue'}
+						onClick={() => toggleColorScheme()}
+						size='lg'
+						style={{ position: 'fixed', left: 120, bottom: 16, zIndex: 999 }}
+					>
+						{colorScheme === 'dark' ? (
+							<Sun size={16} />
+						) : (
+							<MoonStars size={16} />
+						)}
+					</ActionIcon>
 					<Modal
 						opened={opened}
 						size={'md'}
@@ -212,53 +224,53 @@ export default function App() {
 								My Tasks
 							</Title>
 							<Group position={'apart'}>
-								<Button
-									onClick={() => setFilter('all')}
-									variant={filter === 'all' ? 'filled' : 'outline'}
+								<Title
+									sx={theme => ({
+										fontFamily: `Greycliff CF, ${theme.fontFamily}`,
+										fontWeight: 900,
+									})}
 								>
-									All
-								</Button>
-								<Button
-									onClick={() => setFilter('inProgress')}
-									variant={filter === 'inProgress' ? 'filled' : 'outline'}
-								>
-									In Progress
-								</Button>
-								<Button
-									onClick={() => setFilter('done')}
-									variant={filter === 'done' ? 'filled' : 'outline'}
-								>
-									Done
-								</Button>
-								<Button
-									onClick={() => setFilter('lowPriority')}
-									variant={filter === 'lowPriority' ? 'filled' : 'outline'}
-								>
-									Low Priority
-								</Button>
-								<Button
-									onClick={() => setFilter('mediumPriority')}
-									variant={filter === 'mediumPriority' ? 'filled' : 'outline'}
-								>
-									Medium Priority
-								</Button>
-								<Button
-									onClick={() => setFilter('highPriority')}
-									variant={filter === 'highPriority' ? 'filled' : 'outline'}
-								>
-									High Priority
-								</Button>
+									My Tasks
+								</Title>
+								<Grid>
+									<Button
+										onClick={() => setFilter('all')}
+										variant={filter === 'all' ? 'filled' : 'outline'}
+									>
+										All
+									</Button>
+									<Button
+										onClick={() => setFilter('inProgress')}
+										variant={filter === 'inProgress' ? 'filled' : 'outline'}
+									>
+										In Progress
+									</Button>
+									<Button
+										onClick={() => setFilter('done')}
+										variant={filter === 'done' ? 'filled' : 'outline'}
+									>
+										Done
+									</Button>
+									<Button
+										onClick={() => setFilter('lowPriority')}
+										variant={filter === 'lowPriority' ? 'filled' : 'outline'}
+									>
+										Low Priority
+									</Button>
+									<Button
+										onClick={() => setFilter('mediumPriority')}
+										variant={filter === 'mediumPriority' ? 'filled' : 'outline'}
+									>
+										Medium Priority
+									</Button>
+									<Button
+										onClick={() => setFilter('highPriority')}
+										variant={filter === 'highPriority' ? 'filled' : 'outline'}
+									>
+										High Priority
+									</Button>
+								</Grid>
 							</Group>
-							<ActionIcon
-								color={'blue'}
-								onClick={() => toggleColorScheme()}
-								size='lg'>
-								{colorScheme === 'dark' ? (
-									<Sun size={16} />
-								) : (
-									<MoonStars size={16} />
-								)}
-							</ActionIcon>
 						</Group>
 						{tasks.length > 0 ? (
 							tasks.map((task, index) => {
