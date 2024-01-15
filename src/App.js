@@ -15,6 +15,7 @@ import { MoonStars, Sun, Trash } from 'tabler-icons-react';
 import {
 	MantineProvider,
 	ColorSchemeProvider,
+	Select,
 } from '@mantine/core';
 import { useHotkeys, useLocalStorage } from '@mantine/hooks';
 
@@ -22,6 +23,7 @@ export default function App() {
 	const [tasks, setTasks] = useState([]);
 	const [opened, setOpened] = useState(false);
 	const [filter, setFilter] = useState('all');
+	const [taskPriority, setTaskPriority] = useState('low');
 
 	const [colorScheme, setColorScheme] = useLocalStorage({
 		key: 'mantine-color-scheme',
@@ -49,6 +51,7 @@ export default function App() {
 			endDate: taskEndDate.current.value,
 			endTime: taskEndTime.current.value,
 			done: false,
+			priority: taskPriority,
 		};
 
 		setTasks([...tasks, newTask]);
@@ -81,19 +84,43 @@ export default function App() {
 		localStorage.setItem('tasks', JSON.stringify(tasks));
 	}
 
+	function getPriorityColor(priority) {
+		switch (priority) {
+			case 'low':
+				return 'green';
+			case 'medium':
+				return 'yellow';
+			case 'high':
+				return 'red';
+			default:
+				return 'gray';
+		}
+	}
+
 	useEffect(() => {
 		loadTasks();
 	}, []);
+
 
 	return (
 		<ColorSchemeProvider
 			colorScheme={colorScheme}
 			toggleColorScheme={toggleColorScheme}>
+
 			<MantineProvider
 				theme={{ colorScheme, defaultRadius: 'md' }}
 				withGlobalStyles
 				withNormalizeCSS>
+
 				<div className='App'>
+					<Button
+						onClick={() => {
+							setOpened(true);
+						}}
+						style={{ position: 'fixed', left: 16, bottom: 16, zIndex: 999 }}
+					>
+						New Task
+					</Button>
 					<Modal
 						opened={opened}
 						size={'md'}
@@ -116,6 +143,17 @@ export default function App() {
 							mt={'md'}
 							placeholder={'Task Summary'}
 							label={'Summary'}
+						/>
+						<Select
+							label="Priority"
+							placeholder="Select priority"
+							value={taskPriority}
+							onChange={(value) => setTaskPriority(value)}
+							data={[
+								{ value: 'low', label: 'Low' },
+								{ value: 'medium', label: 'Medium' },
+								{ value: 'high', label: 'High' },
+							]}
 						/>
 						<TextInput
 							ref={taskStartDate}
@@ -192,6 +230,24 @@ export default function App() {
 								>
 									Done
 								</Button>
+								<Button
+									onClick={() => setFilter('lowPriority')}
+									variant={filter === 'lowPriority' ? 'filled' : 'outline'}
+								>
+									Low Priority
+								</Button>
+								<Button
+									onClick={() => setFilter('mediumPriority')}
+									variant={filter === 'mediumPriority' ? 'filled' : 'outline'}
+								>
+									Medium Priority
+								</Button>
+								<Button
+									onClick={() => setFilter('highPriority')}
+									variant={filter === 'highPriority' ? 'filled' : 'outline'}
+								>
+									High Priority
+								</Button>
 							</Group>
 							<ActionIcon
 								color={'blue'}
@@ -209,10 +265,13 @@ export default function App() {
 								if (
 									(filter === 'all') ||
 									(filter === 'inProgress' && !task.done) ||
-									(filter === 'done' && task.done)
+									(filter === 'done' && task.done) ||
+									(filter === 'lowPriority' && task.priority === 'low') ||
+									(filter === 'mediumPriority' && task.priority === 'medium') ||
+									(filter === 'highPriority' && task.priority === 'high')
 								) {
 									return (
-										<Card withBorder key={index} mt={'sm'}>
+										<Card withBorder key={index} mt={'sm'} style={{ borderLeft: `7px solid ${getPriorityColor(task.priority)}` }}>
 											<Group position={'apart'}>
 												<Text weight={'bold'}>{task.title}</Text>
 												<ActionIcon
@@ -234,6 +293,9 @@ export default function App() {
 													saveTasks(updatedTasks);
 												}}
 											/>
+											<Text color={'dimmed'} size={'md'} mt={'sm'}>
+												Priority: {task.priority}
+											</Text>
 											<Text color={'dimmed'} size={'md'} mt={'sm'}>
 												{task.summary
 													? task.summary
