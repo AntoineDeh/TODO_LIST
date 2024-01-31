@@ -32,7 +32,7 @@ Page 2 (Calendar) :
 
 ## Bugs
 
-Bug principale : Impossible d'afficher les données de la base de données locale (récupérer en tant que "Undefined")
+Bug principale : Impossible d'afficher les données de la base de données locale (récupérer en tant que "Undefined") après l'ajout d'un nouveau Todo et le rafraichissement de la page.
 
 ## Axes d'améliorations
 
