@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import CalendarPage from './pages/CalendarPage';
 import TodoList from "./pages/TodoList";
 import NoPage from "./pages/NoPage";
-import {useState} from "react";
 
 export default function App() {
 
