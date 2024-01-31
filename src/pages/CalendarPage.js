@@ -63,9 +63,6 @@ export default function CalendarPage() {
 
     const toggleColorScheme = (value) => setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'));
 
-    function saveTasks(tasks) {
-        localStorage.setItem('tasks', JSON.stringify(tasks));
-    }
     function loadTasks() {
         let loadedTasks = localStorage.getItem('tasks');
 
