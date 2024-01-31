@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
-import { Button, ActionIcon } from '@mantine/core';
+import { Button, ActionIcon, Modal} from '@mantine/core';
 import { MoonStars, Sun } from 'tabler-icons-react';
 import { useNavigate } from 'react-router-dom';
 import { useLocalStorage } from '@mantine/hooks';
 import { MantineProvider, ColorSchemeProvider } from '@mantine/core';
+import './CalendarPage.css';
 
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
@@ -13,10 +14,43 @@ const localizer = momentLocalizer(moment);
 
 export default function CalendarPage() {
     const [tasks, setTasks] = useState([]);
-    const events = tasks.map((task) => ({
+    const [showCompletedTasks, setShowCompletedTasks] = useState(true);
+    const [selectedTask, setSelectedTask] = useState(null); // Nouvel état pour la tâche sélectionnée
+    const [isTaskModalOpen, setTaskModalOpen] = useState(false); // Nouvel état pour le modal
+
+    const getPriorityColor = (priority) => {
+        switch (priority) {
+            case 'low':
+                return 'green';
+            case 'medium':
+                return 'orange';
+            case 'high':
+                return 'red';
+            default:
+                return 'gray';
+        }
+    };
+
+    const getPriorityTextColor = (priority) => {
+        switch (priority) {
+            case 'low':
+                return 'green-text'; // Classe pour la priorité basse
+            case 'medium':
+                return 'orange-text'; // Classe pour la priorité moyenne
+            case 'high':
+                return 'red-text'; // Classe pour la priorité élevée
+            default:
+                return 'gray-text'; // Classe par défaut
+        }
+    };
+
+    const filteredTasks = showCompletedTasks ? tasks : tasks.filter(task => !task.done);
+
+    const events = filteredTasks.map((task) => ({
         title: task.title,
         start: new Date(task.startDate + 'T' + task.startTime),
         end: new Date(task.endDate + 'T' + task.endTime),
+        backgroundColor: getPriorityColor(task.priority),
     }));
 
     const navigate = useNavigate();
@@ -29,41 +63,121 @@ export default function CalendarPage() {
 
     const toggleColorScheme = (value) => setColorScheme(value || (colorScheme === 'dark' ? 'light' : 'dark'));
 
+    function saveTasks(tasks) {
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
     function loadTasks() {
         let loadedTasks = localStorage.getItem('tasks');
 
-        let tasks = JSON.parse(loadedTasks);
+        if (loadedTasks !== null) {
+            try {
+                let tasks = JSON.parse(loadedTasks);
 
-        if (tasks) {
-            tasks = tasks.map(task => ({ ...task, done: task.done || false }));
-            setTasks(tasks);
+                // Vérifiez si 'tasks' est un tableau avant de le traiter
+                if (Array.isArray(tasks)) {
+                    tasks = tasks.map(task => ({ ...task, done: task.done || false }));
+                    setTasks(tasks);
+                } else {
+                    console.error("'tasks' is not an array:", tasks);
+                }
+            } catch (error) {
+                console.error("Error parsing JSON:", error);
+            }
         }
     }
+
+    const handleEventClick = (event) => {
+        const selectedTask = tasks.find(task => task.title === event.title);
+        setSelectedTask(selectedTask);
+        setTaskModalOpen(true);
+    };
+
+    const handleCloseTaskModal = () => {
+        setTaskModalOpen(false);
+    };
+
     useEffect(() => {
         loadTasks();
     }, []);
-
-    console.log(tasks);
 
     return (
         <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
             <MantineProvider theme={{ colorScheme, defaultRadius: 'md' }} withGlobalStyles withNormalizeCSS>
                 <div>
                     <h1>Calendar Page</h1>
+
+                    <label>
+                        <input
+                            type="checkbox"
+                            checked={showCompletedTasks}
+                            onChange={() => setShowCompletedTasks(!showCompletedTasks)}
+                        />
+                        Show Completed Tasks
+                    </label>
+
                     <Calendar
                         localizer={localizer}
                         events={events}
                         startAccessor="start"
                         endAccessor="end"
-                        style={{ height: 500 }}
+                        style={{height: 500}}
+                        eventPropGetter={(event) => ({
+                            style: {
+                                backgroundColor: event.backgroundColor,
+                            },
+                        })}
+                        onSelectEvent={handleEventClick}  // Appelé lorsqu'une tâche est cliquée
                     />
+
+                    {/* Ajout du modal pour afficher les détails de la tâche */}
+                    {selectedTask && (
+                        <Modal
+                            opened={isTaskModalOpen}
+                            size={'md'}
+                            title={
+                                <div className={`task-details-title ${getPriorityTextColor(selectedTask.priority)}`}>
+                                    {selectedTask.title}
+                                </div>
+                            }
+                            withCloseButton
+                            onClose={handleCloseTaskModal}
+                            centered
+                        >
+                            <div className="task-details">
+                                <div className="task-details-item">
+                                    <span>Priority:</span>
+                                    <span>{selectedTask.priority}</span>
+                                </div>
+                                <div className="task-details-item">
+                                    <span>Summary:</span>
+                                    <span>{selectedTask.summary || 'No summary provided'}</span>
+                                </div>
+                                <div className="task-details-item">
+                                    <span>Start Date:</span>
+                                    <span>{selectedTask.startDate || 'Not specified'}</span>
+                                </div>
+                                <div className="task-details-item">
+                                    <span>Start Time:</span>
+                                    <span>{selectedTask.startTime || 'Not specified'}</span>
+                                </div>
+                                <div className="task-details-item">
+                                    <span>End Date:</span>
+                                    <span>{selectedTask.endDate || 'Not specified'}</span>
+                                </div>
+                                <div className="task-details-item">
+                                    <span>End Time:</span>
+                                    <span>{selectedTask.endTime || 'Not specified'}</span>
+                                </div>
+                            </div>
+                        </Modal>
+                    )}
 
                     {/* Ajout des boutons */}
                     <Button
                         onClick={() => {
                             navigate('/todo_react_app');
                         }}
-                        style={{ position: 'fixed', left: 16, bottom: 16, zIndex: 999 }}
+                        style={{position: 'fixed', left: 16, bottom: 16, zIndex: 999}}
                     >
                         TodoList
                     </Button>
@@ -71,9 +185,9 @@ export default function CalendarPage() {
                         color={'blue'}
                         onClick={() => toggleColorScheme()}
                         size="lg"
-                        style={{ position: 'fixed', left: 120, bottom: 16, zIndex: 999 }}
+                        style={{position: 'fixed', left: 120, bottom: 16, zIndex: 999}}
                     >
-                        {colorScheme === 'dark' ? <Sun size={16} /> : <MoonStars size={16} />}
+                        {colorScheme === 'dark' ? <Sun size={16}/> : <MoonStars size={16}/>}
                     </ActionIcon>
                 </div>
             </MantineProvider>

@@ -1,14 +1,17 @@
 Créateurs :
 
-Dehoux Antoine
-Jean Eudes Laguérie
+Dehoux Antoine et Jean-Eudes Laguérie
 
 Pour installation :
-git clone https://github.com/AntoineDeh/TODO_LIST.git
 
-cd TODO_LIST
-npm install
-npm start
+- git clone https://github.com/AntoineDeh/TODO_LIST.git
+- cd TODO_LIST
+- npm install
+- npm install react-router-dom
+- npm install react-big-calendar
+- npm install react-big-calendar moment
+- npm install react-icons
+- npm start
 
 
 ## 😃 Features:
