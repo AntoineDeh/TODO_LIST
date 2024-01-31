@@ -57,9 +57,8 @@ export default function TodoList() {
             priority: taskPriority,
         };
 
-        setTasks([...tasks, newTask]);
-
-        saveTasks([...tasks, newTask]);
+        setTasks((prevTasks) => [...prevTasks, newTask]);  // Utilisez la fonction de mise à jour de l'état
+        saveTasks((prevTasks) => [...prevTasks, newTask]);
     }
 
     function deleteTask(index) {
@@ -356,14 +355,6 @@ export default function TodoList() {
                                 You have no tasks
                             </Text>
                         )}
-                        <Button
-                            onClick={() => {
-                                setOpened(true);
-                            }}
-                            fullWidth
-                            mt={'md'}>
-                            New Task
-                        </Button>
                     </Container>
                 </div>
             </MantineProvider>
