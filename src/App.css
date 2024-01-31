@@ -10,7 +10,6 @@
     right:30px;
 }
 
-/* Ajoute ce style pour effacer les flottants et garantir que le reste du contenu suit correctement */
 .clearfix::after {
     content: '';
     display: table;

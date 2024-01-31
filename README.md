@@ -29,3 +29,17 @@ Page 2 (Calendar) :
 - Light \ dark mode toggle
 - Show the todos with their priority colors and more information about them by clicking on them
 
+
+## Bugs
+
+Bug principale : Impossible d'afficher les données de la base de données locale (récupérer en tant que "Undefined")
+
+## Axes d'améliorations
+
+- Ajouter de la beauté visuelle aux pages
+- Ajouter des tests unitaires
+- Améliorer la gestion les erreurs
+- Améliorer la qualité du code
+- Renforcé la sécurité et résoudre les vulnérabilités
+- Pouvoir changer la langue des pages
+- Configurer un processus de déploiement automatique de l'application

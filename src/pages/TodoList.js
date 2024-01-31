@@ -138,7 +138,7 @@ export default function TodoList() {
                 <div className='App'>
                     <Button
                         onClick={() => {
-                            navigate('/CalendarPage'); // Utilisez la fonction de navigation pour rediriger
+                            navigate('/CalendarPage');
                         }}
                         style={{ position: 'fixed', left: 120, bottom: 16, zIndex: 999 }}
                     >
@@ -247,7 +247,6 @@ export default function TodoList() {
                     </Modal>
 
                     <div className='title-container'>
-                        {/* Titre "My Tasks" à gauche */}
                         <Title
                             sx={{
                                 fontFamily: 'Greycliff CF',
@@ -258,10 +257,8 @@ export default function TodoList() {
                         </Title>
                     </div>
 
-                    {/* Conteneur pour les filtres à droite */}
                     <div className='filter-container' style={{ flexDirection: 'column' }}>
                         <Group>
-                            {/* Filtre 1 */}
                             <Button
                                 onClick={() => setFilter('all')}
                                 variant={filter === 'all' ? 'filled' : 'outline'}
@@ -283,7 +280,6 @@ export default function TodoList() {
                         </Group>
 
                         <Group>
-                            {/* Filtre 2 */}
                             <Button
                                 onClick={() => setFilter('lowPriority')}
                                 variant={filter === 'lowPriority' ? 'filled' : 'outline'}

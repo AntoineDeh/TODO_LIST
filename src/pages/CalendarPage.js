@@ -34,13 +34,13 @@ export default function CalendarPage() {
     const getPriorityTextColor = (priority) => {
         switch (priority) {
             case 'low':
-                return 'green-text'; // Classe pour la priorité basse
+                return 'green-text';
             case 'medium':
-                return 'orange-text'; // Classe pour la priorité moyenne
+                return 'orange-text';
             case 'high':
-                return 'red-text'; // Classe pour la priorité élevée
+                return 'red-text';
             default:
-                return 'gray-text'; // Classe par défaut
+                return 'gray-text';
         }
     };
 
@@ -70,7 +70,6 @@ export default function CalendarPage() {
             try {
                 let tasks = JSON.parse(loadedTasks);
 
-                // Vérifiez si 'tasks' est un tableau avant de le traiter
                 if (Array.isArray(tasks)) {
                     tasks = tasks.map(task => ({ ...task, done: task.done || false }));
                     setTasks(tasks);
@@ -123,10 +122,9 @@ export default function CalendarPage() {
                                 backgroundColor: event.backgroundColor,
                             },
                         })}
-                        onSelectEvent={handleEventClick}  // Appelé lorsqu'une tâche est cliquée
+                        onSelectEvent={handleEventClick}
                     />
 
-                    {/* Ajout du modal pour afficher les détails de la tâche */}
                     {selectedTask && (
                         <Modal
                             opened={isTaskModalOpen}
@@ -169,7 +167,6 @@ export default function CalendarPage() {
                         </Modal>
                     )}
 
-                    {/* Ajout des boutons */}
                     <Button
                         onClick={() => {
                             navigate('/todo_react_app');
